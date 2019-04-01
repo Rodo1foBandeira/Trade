@@ -38,7 +38,8 @@ var robo = {
 		}
 	},
 	comprarComGain: function(valor, qtd) {
-		robo.operacoes.push({valorOrdem: valor, qtd: qtd, tipo: 'CG',  data: new Date() })
+		robo.operacoes.push({valorOrdem: valor, qtd: qtd, tipo: 'CG',  data: new Date() });
+		console.log('Comprado: ' + valor + ' x ' + qtd);
 	},
 	
 	vender: function(valor, qtd) {
@@ -63,7 +64,8 @@ var robo = {
 		}
 	},
 	venderComGain: function(valor, qtd) {
-		robo.operacoes.push({valorOrdem: valor, qtd: qtd, tipo: 'VG',  data: new Date() })
+		robo.operacoes.push({valorOrdem: valor, qtd: qtd, tipo: 'VG',  data: new Date() });
+		console.log('Vendido: ' + valor + ' x ' + qtd);
 	},
 	
 	gerenciarStops: function(valorAtual){
@@ -82,7 +84,7 @@ var robo = {
 			// Verifica somente loss
 			if (o.valorOrdem - valorAtual >= robo.loss){
 				// loss
-				console.log('Loss: ' + o.valorOrdem - valorAtual);
+				console.log('Loss: ' + (o.valorOrdem - valorAtual));
 				o.finalizado = valorAtual;
 				o.dataFinalizacao = new Date();
 				robo.flagOperacaoFechada = true;
@@ -92,7 +94,7 @@ var robo = {
 				o.finalizado = valorAtual;
 				o.dataFinalizacao = new Date();
 				robo.flagOperacaoFechada = true;
-				console.log('Loss seguiu tendencia: ' + o.valorOrdem - valorAtual);
+				console.log('Loss seguiu tendencia: ' + (o.valorOrdem - valorAtual));
 			}*/
 		})
 		
@@ -103,13 +105,13 @@ var robo = {
 			// Verifica loss e gain fixos
 			if (o.valorOrdem - valorAtual >= robo.loss){
 				// loss
-				console.log('Loss: ' + o.valorOrdem - valorAtual);
+				console.log('Loss: ' + (o.valorOrdem - valorAtual));
 				o.finalizado = valorAtual;
 				o.dataFinalizacao = new Date();
 				robo.flagOperacaoFechada = true;
 			} else if (valorAtual - o.valorOrdem >= robo.gain){
 				// gain
-				console.log('Gain: ' + o.valorOrdem - valorAtual);
+				console.log('Gain: ' + (valorAtual - o.valorOrdem));
 				o.finalizado = valorAtual;
 				o.dataFinalizacao = new Date();
 				robo.flagOperacaoFechada = true;
@@ -124,13 +126,13 @@ var robo = {
 			// Verifica somente loss
 			if (valorAtual - o.valorOrdem >= robo.loss){
 				// loss
-				console.log('Loss: ' + valorAtual - o.valorOrdem);
+				console.log('Loss: ' + (valorAtual - o.valorOrdem));
 				o.dataFinalizacao = new Date();
 				o.finalizado = valorAtual;
 				robo.flagOperacaoFechada = true;
 			}/* else if (valorAtual - robo.ultimaMin >= robo.loss){
 				// Loss de tendencia
-				console.log('Loss seguiu tendencia: ' + valorAtual - robo.ultimaMin);
+				console.log('Loss seguiu tendencia: ' + (valorAtual - robo.ultimaMin));
 				o.dataFinalizacao = new Date();
 				o.finalizado = valorAtual;				
 				robo.flagOperacaoFechada = true;
@@ -144,13 +146,13 @@ var robo = {
 			// Verifica loss e gain fixos
 			if (valorAtual - o.valorOrdem >= robo.loss){
 				// loss
-				console.log('Loss: ' + valorAtual - o.valorOrdem);
+				console.log('Loss: ' + (valorAtual - o.valorOrdem));
 				o.dataFinalizacao = new Date();
 				o.finalizado = valorAtual;
 				robo.flagOperacaoFechada = true;
 			} else if (o.valorOrdem - valorAtual  >= robo.gain){
 				// gain
-				console.log('Gain: ' + o.valorOrdem - valorAtual);
+				console.log('Gain: ' + (o.valorOrdem - valorAtual));
 				o.dataFinalizacao = new Date();
 				o.finalizado = valorAtual;
 				robo.flagOperacaoFechada = true;
@@ -161,10 +163,10 @@ var robo = {
 			robo.soma = 0;
 			robo.operacoes.filter(function(o, i){ return o.finalizado != undefined && o.finalizado != null && o.finalizado > 0}).forEach(function(o, i){	
 				if (o.tipo == 'CG'){
-					soma += o.finalizado - o.valorOrdem;
+					robo.soma += o.finalizado - o.valorOrdem;
 				}
 				if (o.tipo == 'VG'){
-					soma += o.valorOrdem - o.finalizado;
+					robo.soma += o.valorOrdem - o.finalizado;
 				}
 				
 			});
@@ -212,8 +214,7 @@ var robo = {
 						// Pavio >= 50% do tick
 						// Venda
 						//robo.comprar(robo.valorAtual, 1);
-						robo.comprarComGain(robo.valorAtual, 1)
-						
+						robo.comprarComGain(robo.valorAtual, 1)						
 					}
 					robo.min = robo.valorAtual;
 					//robo.ticks.push({minima: robo.min, abertura: robo.abertura, fechamento: robo.valorAtual, maxima: robo.max});
