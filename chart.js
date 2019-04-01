@@ -7,11 +7,11 @@ var chart = new CanvasJS.Chart("chartContainer",
 	},
 	axisY: {
 		includeZero: false,
-		interval: 1,
+		interval: 90,
 		//title: "Temperature (C)"
 	},
 	axisX: {
-		interval: 30
+		interval: 1
 		},
 	data: [
 		{

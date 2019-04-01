@@ -10,26 +10,28 @@ var robo = {
 	valorAtual: 0,
 	tick: 30,
 	operacoes:[],
-	operacaoesAbertas: [],
+	operacoesAbertas: [],
 	ticks: [],
 	ultimaMax: 0,
 	ultimaMin: 0,
+	flagOperacaoFechada: false,
+	soma: 0,
 	comprar: function(valor, qtd) {		
-		robo.operacaoesAbertas = robo.operacoes.filter(function(o, i){
+		robo.operacoesAbertas = robo.operacoes.filter(function(o, i){
 			return (o.finalizado == undefined || o.finalizado == null) && o.tipo == 'V';
 		}) // Filtra posiçoes que esta vendido
-		if (robo.operacaoesAbertas.length > 0){
+		if (robo.operacoesAbertas.length > 0){
 			// Esta vendido, reverte posição
-			robo.operacaoesAbertas.forEach(function(o, i){
+			robo.operacoesAbertas.forEach(function(o, i){
 				o.finalizado = valor;
 				o.dataFinalizacao = new Date();
 				robo.operacoes.push({valorOrdem: valor, qtd: qtd, tipo: 'C', data: o.dataFinalizacao })
 			})
 		}else{			
-			robo.operacaoesAbertas = robo.operacoes.filter(function(o, i){
+			robo.operacoesAbertas = robo.operacoes.filter(function(o, i){
 				return (o.finalizado == undefined || o.finalizado == null) && o.tipo == 'C';
 			})// Filtra posiçoes que esta comprado
-			if (robo.operacaoesAbertas.length == 0){
+			if (robo.operacoesAbertas.length == 0){
 				// Nao tem compra, entao compra
 				robo.operacoes.push({valorOrdem: valor, qtd: qtd, tipo: 'C', data: new Date() })
 			}
@@ -40,21 +42,21 @@ var robo = {
 	},
 	
 	vender: function(valor, qtd) {
-		robo.operacaoesAbertas = robo.operacoes.filter(function(o, i){
+		robo.operacoesAbertas = robo.operacoes.filter(function(o, i){
 			return (o.finalizado == undefined || o.finalizado == null) && o.tipo == 'C';
 		}) // Filtra posiçoes que esta comprado
-		if (robo.operacaoesAbertas.length > 0){
+		if (robo.operacoesAbertas.length > 0){
 			// Esta comprado, reverte posição
-			robo.operacaoesAbertas.forEach(function(o, i){
+			robo.operacoesAbertas.forEach(function(o, i){
 				o.finalizado = valor;
 				o.dataFinalizacao = new Date();
 				robo.operacoes.push({valorOrdem: valor, qtd: qtd, tipo: 'V' })
 			})
 		}else{			
-			robo.operacaoesAbertas = robo.operacoes.filter(function(o, i){
+			robo.operacoesAbertas = robo.operacoes.filter(function(o, i){
 				return (o.finalizado == undefined || o.finalizado == null) && o.tipo == 'V';
 			})// Filtra posiçoes que esta vendido
-			if (robo.operacaoesAbertas.length == 0){
+			if (robo.operacoesAbertas.length == 0){
 				// Nao tem compra, entao compra
 				robo.operacoes.push({valorOrdem: valor, qtd: qtd, tipo: 'V',  data: new Date() })
 			}
@@ -65,83 +67,115 @@ var robo = {
 	},
 	
 	gerenciarStops: function(valorAtual){
+		robo.flagOperacaoFechada = false;
 		if (valorAtual > robo.ultimaMax)
 			robo.ultimaMax = valorAtual;
 			
 		if (valorAtual < robo.ultimaMin)
 			robo.ultimaMin = valorAtual;
 			
-		robo.operacaoesAbertas = robo.operacoes.filter(function(o, i){
+		robo.operacoesAbertas = robo.operacoes.filter(function(o, i){
 			return (o.finalizado == undefined || o.finalizado == null) && o.tipo == 'C';
 		}) // Filtra posiçoes que esta comprado
-		robo.operacaoesAbertas.forEach(function(o, i){
+		robo.operacoesAbertas.forEach(function(o, i){
 			// Estrategia de reversão
 			// Verifica somente loss
 			if (o.valorOrdem - valorAtual >= robo.loss){
 				// loss
+				console.log('Loss: ' + o.valorOrdem - valorAtual);
 				o.finalizado = valorAtual;
 				o.dataFinalizacao = new Date();
+				robo.flagOperacaoFechada = true;
 				
 			} /*else if (robo.ultimaMax - valorAtual >= robo.loss){
 				// loss de tendencia
 				o.finalizado = valorAtual;
 				o.dataFinalizacao = new Date();
+				robo.flagOperacaoFechada = true;
+				console.log('Loss seguiu tendencia: ' + o.valorOrdem - valorAtual);
 			}*/
 		})
 		
-		robo.operacaoesAbertas = robo.operacoes.filter(function(o, i){
+		robo.operacoesAbertas = robo.operacoes.filter(function(o, i){
 			return (o.finalizado == undefined || o.finalizado == null) && o.tipo == 'CG';
 		}) // Filtra posiçoes que esta comprado		
-		robo.operacaoesAbertas.forEach(function(o, i){
+		robo.operacoesAbertas.forEach(function(o, i){
 			// Verifica loss e gain fixos
 			if (o.valorOrdem - valorAtual >= robo.loss){
 				// loss
+				console.log('Loss: ' + o.valorOrdem - valorAtual);
 				o.finalizado = valorAtual;
 				o.dataFinalizacao = new Date();
+				robo.flagOperacaoFechada = true;
 			} else if (valorAtual - o.valorOrdem >= robo.gain){
 				// gain
+				console.log('Gain: ' + o.valorOrdem - valorAtual);
 				o.finalizado = valorAtual;
 				o.dataFinalizacao = new Date();
+				robo.flagOperacaoFechada = true;
 			}
 		})
 		
-		robo.operacaoesAbertas = robo.operacoes.filter(function(o, i){
+		robo.operacoesAbertas = robo.operacoes.filter(function(o, i){
 			return (o.finalizado == undefined || o.finalizado == null) && o.tipo == 'V';
 		}) // Filtra posiçoes que esta vendido
-		robo.operacaoesAbertas.forEach(function(o, i){
+		robo.operacoesAbertas.forEach(function(o, i){
 			// Estrategia de reversão
 			// Verifica somente loss
 			if (valorAtual - o.valorOrdem >= robo.loss){
 				// loss
+				console.log('Loss: ' + valorAtual - o.valorOrdem);
 				o.dataFinalizacao = new Date();
 				o.finalizado = valorAtual;
+				robo.flagOperacaoFechada = true;
 			}/* else if (valorAtual - robo.ultimaMin >= robo.loss){
 				// Loss de tendencia
+				console.log('Loss seguiu tendencia: ' + valorAtual - robo.ultimaMin);
 				o.dataFinalizacao = new Date();
-				o.finalizado = valorAtual;
+				o.finalizado = valorAtual;				
+				robo.flagOperacaoFechada = true;
 			}*/
 		})
 		
-		robo.operacaoesAbertas = robo.operacoes.filter(function(o, i){
+		robo.operacoesAbertas = robo.operacoes.filter(function(o, i){
 			return (o.finalizado == undefined || o.finalizado == null) && o.tipo == 'VG';
 		}) // Filtra posiçoes que esta vendido
-		robo.operacaoesAbertas.forEach(function(o, i){
+		robo.operacoesAbertas.forEach(function(o, i){
 			// Verifica loss e gain fixos
 			if (valorAtual - o.valorOrdem >= robo.loss){
 				// loss
+				console.log('Loss: ' + valorAtual - o.valorOrdem);
 				o.dataFinalizacao = new Date();
 				o.finalizado = valorAtual;
+				robo.flagOperacaoFechada = true;
 			} else if (o.valorOrdem - valorAtual  >= robo.gain){
 				// gain
+				console.log('Gain: ' + o.valorOrdem - valorAtual);
 				o.dataFinalizacao = new Date();
 				o.finalizado = valorAtual;
+				robo.flagOperacaoFechada = true;
 			}
 		})
+		
+		if (robo.flagOperacaoFechada){
+			robo.soma = 0;
+			robo.operacoes.filter(function(o, i){ return o.finalizado != undefined && o.finalizado != null && o.finalizado > 0}).forEach(function(o, i){	
+				if (o.tipo == 'CG'){
+					soma += o.finalizado - o.valorOrdem;
+				}
+				if (o.tipo == 'VG'){
+					soma += o.valorOrdem - o.finalizado;
+				}
+				
+			});
+			console.log('Saldo: ' + robo.soma);
+		}
 	},
 	
 	processar: function(){
-		$.get(robo.url, function( data ) {
-			robo.valorAtual = parseInt(data.Value[0].Ps.P);
+		//$.get(robo.url, function( data ) {
+			//robo.valorAtual = parseInt(data.Value[0].Ps.P);
+			robo.valorAtual = parseInt($('#tst1').text().replace('.', ''));
 			if (robo.valorAtual != robo.fechamento){
 				if (robo.valorAtual > robo.max){
 					// Teve nova maxima
@@ -152,34 +186,38 @@ var robo = {
 					robo.min = robo.valorAtual
 				}		
 
-				chart.atualizarUltimo({minima: robo.min, abertura: robo.abertura, fechamento: robo.valorAtual, maxima: robo.max});
+				//chart.atualizarUltimo({minima: robo.min, abertura: robo.abertura, fechamento: robo.valorAtual, maxima: robo.max});
+				
+				robo.operacoesAbertas = robo.operacoes.filter(function(o, i){
+						return (o.finalizado == undefined || o.finalizado == null);
+					}) // Filtra posiçoes
 				
 				if (robo.valorAtual - robo.min >= robo.tick){
-					// Fechamento em alta 
-					if (robo.abertura - robo.min >= (robo.tick / 2)){
+					// Fechamento em alta					
+					if (robo.operacoesAbertas.length == 0 && robo.abertura - robo.min >= (robo.tick / 2)){
 						// Pavio >= 50% do tick
 						// Compra
-						robo.vender(robo.valorAtual, 1);
+						//robo.vender(robo.valorAtual, 1);
 						robo.venderComGain(robo.valorAtual, 1)
 					}
 					robo.max = robo.valorAtual;
 					//robo.ticks.push({minima: robo.min, abertura: robo.abertura, fechamento: robo.valorAtual, maxima: robo.max});
-					chart.atualizar({minima: robo.min, abertura: robo.abertura, fechamento: robo.valorAtual, maxima: robo.max});
+					//chart.atualizar({minima: robo.min, abertura: robo.abertura, fechamento: robo.valorAtual, maxima: robo.max});
 					robo.min = robo.valorAtual;
 					robo.abertura = robo.valorAtual;
 				}
 				if (robo.max - robo.valorAtual >= robo.tick){
 					// Fechamento em baixa
-					if (robo.max - robo.abertura >= (robo.tick / 2)){
+					if (robo.operacoesAbertas.length == 0 && robo.max - robo.abertura >= (robo.tick / 2)){
 						// Pavio >= 50% do tick
 						// Venda
-						robo.comprar(robo.valorAtual, 1);
+						//robo.comprar(robo.valorAtual, 1);
 						robo.comprarComGain(robo.valorAtual, 1)
 						
 					}
 					robo.min = robo.valorAtual;
 					//robo.ticks.push({minima: robo.min, abertura: robo.abertura, fechamento: robo.valorAtual, maxima: robo.max});
-					chart.atualizar({minima: robo.min, abertura: robo.abertura, fechamento: robo.valorAtual, maxima: robo.max});
+					//chart.atualizar({minima: robo.min, abertura: robo.abertura, fechamento: robo.valorAtual, maxima: robo.max});
 					robo.max = robo.valorAtual;
 					robo.abertura = robo.valorAtual;
 					
@@ -187,9 +225,9 @@ var robo = {
 				robo.gerenciarStops(robo.valorAtual);
 				robo.fechamento = robo.valorAtual;
 			}
-			if (robo.ativo)
-				robo.processar();
-		})
+			//if (robo.ativo)
+				//robo.processar();
+		//})
 	}
 }
 
