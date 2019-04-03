@@ -25,6 +25,8 @@ chart.render();
 
 chart.count = 0;
 
+
+
 chart.atualizarUltimo = function(candle){
 	// candle.y[o, h, l, c]
 	if (chart.data[0].dataPoints.length > 0){
@@ -33,7 +35,7 @@ chart.atualizarUltimo = function(candle){
 	}	
 }
 
-chart.atualizar = function(candle){				
+chart.atualizar = function(candle){					
 	// candle.y[o, h, l, c]
 	var candle = {
 		x: chart.count,
