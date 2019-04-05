@@ -7,7 +7,7 @@ var chart = new CanvasJS.Chart("chartContainer",
 	},
 	axisY: {
 		includeZero: false,
-		interval: 90,
+		interval: 30,
 		//title: "Temperature (C)"
 	},
 	axisX: {
@@ -50,7 +50,7 @@ chart.atualizar = function(candle){
 		
 		chart.count++;
 		
-		if(chart.data[0].dataPoints.length > 120){
+		/*if(chart.data[0].dataPoints.length > 120){
 			chart.data[0].dataPoints.splice(0, 1);
-		}
+		}*/
 	}
