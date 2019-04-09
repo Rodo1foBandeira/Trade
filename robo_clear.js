@@ -29,9 +29,29 @@ var robo = {
 	
 	seletorValorAtual: '.asset-WINJ19 .asset-price',
 
+	abaOrdens: '#ordens',
+	abaPosicao: '#posicao',
+	abaPosicaoQtd: '.custody-asset-WINJ19 .custody-quantity',
+	abaPosicaoValor: '.custody-asset-WINJ19 .custody-pnl',
+
+	posicao: 0,
+	valorPosicao: 0.0,
+
+	verificarPosicao: function(){
+		if ($(robo.abaPosicaoQtd).length > 0){
+			robo.posicao = parseInt($(robo.abaPosicaoQtd).text());
+			robo.valorPosicao = parseFloat($(robo.abaPosicaoValor).text().replace('R$', '').trim().replace('.', '').replace(',', '.'));
+			console.log('Posicionado: ' + robo.posicao);
+			console.log('Valor R$ ' + robo.valorPosicao);
+		}
+		setTimeout('$(robo.abaOrdens).click()', 2000);
+		setTimeout('$(robo.abaPosicao).click()', 4000);
+	},	
+
 	otoComprar: function(valor) {
-		if (robo.ultimaOperacao == null || Math.abs(new Date() - robo.ultimaOperacao) > 50000){
+		if (robo.ultimaOperacao == null || Math.abs(new Date() - robo.ultimaOperacao) > 10000){
 			robo.ultimaOperacao = new Date();
+			robo.posicao = robo.qtdOperacao;
 			$(robo.abaOtoCompra).click(); // Clica na aba de compra
 			$(robo.abaTipoOrdem).val(4); // Seta OTO		
 			$(robo.abaTipoOrdem).change();
@@ -41,8 +61,9 @@ var robo = {
 		}
 	},
 	otoVender: function(valor) {
-		if (robo.ultimaOperacao == null || Math.abs(new Date() - robo.ultimaOperacao) > 50000){
+		if (robo.ultimaOperacao == null || Math.abs(new Date() - robo.ultimaOperacao) > 10000){
 			robo.ultimaOperacao = new Date();
+			robo.posicao = -robo.qtdOperacao;
 			$(robo.abaOtoVenda).click(); // Clica na aba de venda
 			$(robo.abaTipoOrdem).val(4); // Seta OTO		
 			$(robo.abaTipoOrdem).change();
@@ -50,25 +71,6 @@ var robo = {
 			$(robo.abaOtoEfetuarOrdem).click(); // Efetua venda
 			console.log('Venda: ' + valor);
 		}
-	},	
-	
-	abaOrdens: '#ordens',
-	abaPosicao: '#posicao',
-	abaPosicaoQtd: '.custody-asset-WINJ19 .custody-quantity',
-	abaPosicaoValor: '.custody-asset-WINJ19 .custody-pnl',
-
-	naoPosicionado: function(){		
-		var naoPosicionad = true;
-		if ($(robo.abaPosicaoQtd).length > 0)
-			naoPosicionad = parseInt($(robo.abaPosicaoQtd).text()) == 0;		
-		return naoPosicionad; 
-	},
-
-	valorPosicao: function(){
-		var valor = 0.0;
-		if ($(robo.abaPosicaoQtd).length > 0)
-			valor = parseFloat($(robo.abaPosicaoValor).text().replace('R$', '').trim().replace('.', '').replace(',', '.'));		
-		return valor;
 	},
 
 	processar: function(){
@@ -86,7 +88,7 @@ var robo = {
 						
 			if (robo.valorAtual - robo.min >= robo.tick){
 				// Fechamento em alta					
-				if (robo.naoPosicionado() && robo.valorPosicao() >= robo.totalLoss && robo.valorPosicao() <= robo.totalGain && (robo.abertura - robo.min >= (robo.tick / 2))){
+				if (robo.posicao == 0 && robo.valorPosicao >= robo.totalLoss && robo.valorPosicao <= robo.totalGain && (robo.abertura - robo.min >= (robo.tick / 2))){
 					// Pavio >= 50% do tick
 					// Provavelmente teve forte correçao na tendencia de baixa(Scalpers realizando)
 					// Entao entra vendido para ganhar na proxima perna de baixa
@@ -98,7 +100,7 @@ var robo = {
 			}
 			if (robo.max - robo.valorAtual >= robo.tick){
 				// Fechamento em baixa
-				if (robo.naoPosicionado() && robo.valorPosicao() >= robo.totalLoss && robo.valorPosicao() <= robo.totalGain && (robo.max - robo.abertura >= (robo.tick / 2))){
+				if (robo.posicao == 0 && robo.valorPosicao >= robo.totalLoss && robo.valorPosicao <= robo.totalGain && (robo.max - robo.abertura >= (robo.tick / 2))){
 					// Pavio >= 50% do tick
 					// Provavelmente teve forte correçao na tendencia de alta(Scalpers realizando)
 					// Entao entra comprado para ganhar na proxima perna de alta
@@ -120,3 +122,5 @@ robo.max = parseFloat($(robo.seletorValorAtual).text().replace('.', '').replace(
 robo.ultimaMin = parseFloat($(robo.seletorValorAtual).text().replace('.', '').replace(',', '.'));
 robo.ultimaMax = parseFloat($(robo.seletorValorAtual).text().replace('.', '').replace(',', '.'));
 robo.min = parseFloat($(robo.seletorValorAtual).text().replace('.', '').replace(',', '.'));
+
+setInterval('robo.verificarPosicao()', 6000);
