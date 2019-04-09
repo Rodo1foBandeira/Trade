@@ -8,7 +8,7 @@ var robo = {
 	max: 0,
 	min: 0,
 	valorAtual: 0,
-	tick: 30,
+	tick: 45,
 	operacoes:[],
 	operacoesAbertas: [],
 	ticks: [],
@@ -16,7 +16,7 @@ var robo = {
 	ultimaMin: 0,
 	flagOperacaoFechada: false,
 	totalLoss: -200,
-	totalGain: 500,
+	totalGain: 1000,
 	soma: 0,
 	comprar: function(valor, qtd) {		
 		robo.operacoesAbertas = robo.operacoes.filter(function(o, i){
@@ -42,8 +42,6 @@ var robo = {
 	comprarComGain: function(valor, qtd) {
 		robo.operacoes.push({valorOrdem: valor, qtd: qtd, tipo: 'CG',  data: new Date() });
 		console.log('Comprado: ' + valor + ' x ' + qtd);
-		//$('.input-quantity.ui-spinner-input#input-quantity').val(qtd)
-		//$('#button-buy').click();
 	},
 	
 	vender: function(valor, qtd) {
@@ -70,8 +68,6 @@ var robo = {
 	venderComGain: function(valor, qtd) {
 		robo.operacoes.push({valorOrdem: valor, qtd: qtd, tipo: 'VG',  data: new Date() });
 		console.log('Vendido: ' + valor + ' x ' + qtd);
-		//$('.input-quantity.ui-spinner-input#input-quantity').val(qtd)
-		//$('#button-sell').click();
 	},
 	
 	gerenciarStops: function(valorAtual){
@@ -94,8 +90,6 @@ var robo = {
 				o.finalizado = valorAtual;
 				o.dataFinalizacao = new Date();
 				robo.flagOperacaoFechada = true;
-				//$('#input-quantity').val(qtd);
-				//$('#button-sell').click();
 				
 			} /*else if (robo.ultimaMax - valorAtual >= robo.loss){
 				// loss de tendencia
@@ -117,16 +111,12 @@ var robo = {
 				o.finalizado = valorAtual;
 				o.dataFinalizacao = new Date();
 				robo.flagOperacaoFechada = true;
-				//$('.input-quantity.ui-spinner-input#input-quantity').val(o.qtd)
-				//$('#button-sell').click();
 			} else if (valorAtual - o.valorOrdem >= robo.gain){
 				// gain
 				console.log('Gain: ' + (valorAtual - o.valorOrdem));
 				o.finalizado = valorAtual;
 				o.dataFinalizacao = new Date();
 				robo.flagOperacaoFechada = true;
-				//$('.input-quantity.ui-spinner-input#input-quantity').val(o.qtd)
-				//$('#button-sell').click();
 			}
 		})
 		
@@ -142,8 +132,6 @@ var robo = {
 				o.dataFinalizacao = new Date();
 				o.finalizado = valorAtual;
 				robo.flagOperacaoFechada = true;
-				//$('#input-quantity').val(o.qtd);
-				//$('#button-buy').click();
 			}/* else if (valorAtual - robo.ultimaMin >= robo.loss){
 				// Loss de tendencia
 				console.log('Loss seguiu tendencia: ' + (valorAtual - robo.ultimaMin));
@@ -164,16 +152,12 @@ var robo = {
 				o.dataFinalizacao = new Date();
 				o.finalizado = valorAtual;
 				robo.flagOperacaoFechada = true;
-				//$('.input-quantity.ui-spinner-input#input-quantity').val(o.qtd)
-				//$('#button-buy').click();
 			} else if (o.valorOrdem - valorAtual  >= robo.gain){
 				// gain
 				console.log('Gain: ' + (o.valorOrdem - valorAtual));
 				o.dataFinalizacao = new Date();
 				o.finalizado = valorAtual;
 				robo.flagOperacaoFechada = true;
-				//$('.input-quantity.ui-spinner-input#input-quantity').val(o.qtd)
-				//$('#button-buy').click();
 			}
 		})
 		
@@ -196,7 +180,6 @@ var robo = {
 	processar: function(){
 		$.get(robo.url, function( data ) {
 			robo.valorAtual = parseInt(data.Value[0].Ps.P);
-			//robo.valorAtual = parseFloat($('#tst1').text().replace('.', '').replace(',', '.'));
 			if (robo.valorAtual != robo.fechamento){
 				if (robo.valorAtual > robo.max){
 					// Teve nova maxima
@@ -245,8 +228,8 @@ var robo = {
 				robo.gerenciarStops(robo.valorAtual);
 				robo.fechamento = robo.valorAtual;
 			}
-			//if (robo.ativo)
-				robo.processar();
+			
+			setTimeout('robo.processar()', 100);
 		})
 	}
 }

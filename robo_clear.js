@@ -7,13 +7,15 @@ var robo = {
 	max: 0,
 	min: 0,
 	valorAtual: 0,
-	tick: 35,
+	tick: 45,
 	ultimaMax: 0,
 	ultimaMin: 0,
 
-	totalLoss: -40,
+	totalLoss: -70,
 	totalGain: 80,
 	qtdOperacao: 1,
+	
+	ultimaOperacao: null,
 
 	abaOtoTipoOrdem: '#choose-strategy',	
 
@@ -27,40 +29,45 @@ var robo = {
 	
 	seletorValorAtual: '.asset-WINJ19 .asset-price',
 
-	otoComprar: function(valor) {		
-		$(robo.abaOtoCompra).click(); // Clica na aba de compra
-		$(robo.abaTipoOrdem).val(4); // Seta OTO		
-		$(robo.abaTipoOrdem).change();
-		$(robo.abaOtoCompraQtd).val(robo.qtdOperacao);
-		$(robo.abaOtoEfetuarOrdem).click(); // Efetua compra
-		console.log('Compra: ' + valor);
+	otoComprar: function(valor) {
+		if (robo.ultimaOperacao == null || Math.abs(new Date() - robo.ultimaOperacao) > 50000){
+			robo.ultimaOperacao = new Date();
+			$(robo.abaOtoCompra).click(); // Clica na aba de compra
+			$(robo.abaTipoOrdem).val(4); // Seta OTO		
+			$(robo.abaTipoOrdem).change();
+			$(robo.abaOtoCompraQtd).val(robo.qtdOperacao);
+			$(robo.abaOtoEfetuarOrdem).click(); // Efetua compra
+			console.log('Compra: ' + valor);
+		}
 	},
 	otoVender: function(valor) {
-		$(robo.abaOtoVender).click(); // Clica na aba de venda
-		$(robo.abaTipoOrdem).val(4); // Seta OTO		
-		$(robo.abaTipoOrdem).change();
-		$(robo.abaOtoVendaQtd).val(robo.qtdOperacao);
-		$(robo.abaOtoEfetuarOrdem).click(); // Efetua venda
-		console.log('Venda: ' + valor);
+		if (robo.ultimaOperacao == null || Math.abs(new Date() - robo.ultimaOperacao) > 50000){
+			robo.ultimaOperacao = new Date();
+			$(robo.abaOtoVenda).click(); // Clica na aba de venda
+			$(robo.abaTipoOrdem).val(4); // Seta OTO		
+			$(robo.abaTipoOrdem).change();
+			$(robo.abaOtoVendaQtd).val(robo.qtdOperacao);
+			$(robo.abaOtoEfetuarOrdem).click(); // Efetua venda
+			console.log('Venda: ' + valor);
+		}
 	},	
 	
-	abaPosicao: $('body > div.container.daytrade > div.container_views.active > div.views_header > ul > li.active > a'),
-	abaPosicaoQtd: '',
-	abaPosicaoValor: '',
+	abaOrdens: '#ordens',
+	abaPosicao: '#posicao',
+	abaPosicaoQtd: '.custody-asset-WINJ19 .custody-quantity',
+	abaPosicaoValor: '.custody-asset-WINJ19 .custody-pnl',
 
 	naoPosicionado: function(){		
-		$(robo.abaPosicao).click();
 		var naoPosicionad = true;
 		if ($(robo.abaPosicaoQtd).length > 0)
-			naoPosicionad = parseInt($(robo.abaPosicaoQtd).text()) == 0;
+			naoPosicionad = parseInt($(robo.abaPosicaoQtd).text()) == 0;		
 		return naoPosicionad; 
 	},
 
 	valorPosicao: function(){
-		$(robo.abaPosicao).click();
 		var valor = 0.0;
 		if ($(robo.abaPosicaoQtd).length > 0)
-			valor = parseFloat($(robo.abaPosicaoValor).text().replace('.', '').replace(',', '.'));
+			valor = parseFloat($(robo.abaPosicaoValor).text().replace('R$', '').trim().replace('.', '').replace(',', '.'));		
 		return valor;
 	},
 
@@ -91,7 +98,7 @@ var robo = {
 			}
 			if (robo.max - robo.valorAtual >= robo.tick){
 				// Fechamento em baixa
-				if (robo.naoPosicionado() && robo.valorPosicao() >= robo.totalLoss && robo.valorPosicao() <= robo.totalGain && (robo.max - robo.abertura >= (robo.tick / 2)){
+				if (robo.naoPosicionado() && robo.valorPosicao() >= robo.totalLoss && robo.valorPosicao() <= robo.totalGain && (robo.max - robo.abertura >= (robo.tick / 2))){
 					// Pavio >= 50% do tick
 					// Provavelmente teve forte correçao na tendencia de alta(Scalpers realizando)
 					// Entao entra comprado para ganhar na proxima perna de alta
