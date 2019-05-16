@@ -1,14 +1,14 @@
 var robo = {
 	ativo: true,
-	url: 'https://mdgateway04.easynvest.com.br/iwg/snapshot/?t=webgateway&c=5448062&q=WINJ19',
-	loss: 65,
-	gain: 65,
+	url: 'https://mdgateway04.easynvest.com.br/iwg/snapshot/?t=webgateway&c=5448062&q=WINM19',
+	loss: 2.5,
+	gain: 3,
 	fechamento: 0,
 	abertura: 0,
 	max: 0,
 	min: 0,
 	valorAtual: 0,
-	tick: 45,
+	tick: 3.5,
 	operacoes:[],
 	operacoesAbertas: [],
 	ticks: [],
@@ -179,7 +179,7 @@ var robo = {
 	
 	processar: function(){
 		$.get(robo.url, function( data ) {
-			robo.valorAtual = parseInt(data.Value[0].Ps.P);
+			robo.valorAtual = parseFloat(data.Value[0].Ps.P);
 			if (robo.valorAtual != robo.fechamento){
 				if (robo.valorAtual > robo.max){
 					// Teve nova maxima
@@ -242,3 +242,6 @@ $.get(robo.url, function( data ) {
 	robo.ultimaMin = parseInt(data.Value[0].Ps.P);
 	robo.ultimaMax = parseInt(data.Value[0].Ps.P);
 })
+
+robo.processar();
+chart.atualizar({minima: robo.min, abertura: robo.abertura, fechamento: robo.valorAtual, maxima: robo.max});
