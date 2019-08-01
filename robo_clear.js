@@ -11,8 +11,8 @@ var robo = {
 	ultimaMax: 0,
 	ultimaMin: 0,
 
-	totalLoss: -70,
-	totalGain: 80,
+	totalLoss: -40,
+	totalGain: 100,
 	qtdOperacao: 1,
 	
 	ultimaOperacao: null,
@@ -27,12 +27,12 @@ var robo = {
 
 	abaOtoEfetuarOrdem: '.assinatura_cta.oto .buy-sell-label button',
 	
-	seletorValorAtual: '.asset-WINJ19 .asset-price',
+	seletorValorAtual: '#winfut',
 
 	abaOrdens: '#ordens',
 	abaPosicao: '#posicao',
-	abaPosicaoQtd: '.custody-asset-WINJ19 .custody-quantity',
-	abaPosicaoValor: '.custody-asset-WINJ19 .custody-pnl',
+	abaPosicaoQtd: '.custody-asset-WINM19 .custody-quantity',
+	abaPosicaoValor: '.custody-asset-WINM19 .custody-pnl',
 
 	posicao: 0,
 	valorPosicao: 0.0,
@@ -49,7 +49,7 @@ var robo = {
 	},	
 
 	otoComprar: function(valor) {
-		if (robo.ultimaOperacao == null || Math.abs(new Date() - robo.ultimaOperacao) > 10000){
+		if (robo.ultimaOperacao == null || Math.abs(new Date() - robo.ultimaOperacao) > 20000){
 			robo.ultimaOperacao = new Date();
 			robo.posicao = robo.qtdOperacao;
 			$(robo.abaOtoCompra).click(); // Clica na aba de compra
@@ -61,7 +61,7 @@ var robo = {
 		}
 	},
 	otoVender: function(valor) {
-		if (robo.ultimaOperacao == null || Math.abs(new Date() - robo.ultimaOperacao) > 10000){
+		if (robo.ultimaOperacao == null || Math.abs(new Date() - robo.ultimaOperacao) > 20000){
 			robo.ultimaOperacao = new Date();
 			robo.posicao = -robo.qtdOperacao;
 			$(robo.abaOtoVenda).click(); // Clica na aba de venda
@@ -124,3 +124,4 @@ robo.ultimaMax = parseFloat($(robo.seletorValorAtual).text().replace('.', '').re
 robo.min = parseFloat($(robo.seletorValorAtual).text().replace('.', '').replace(',', '.'));
 
 setInterval('robo.verificarPosicao()', 6000);
+setInterval('robo.processar()', 50)

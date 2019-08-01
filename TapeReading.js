@@ -31,7 +31,7 @@ var chart = new CanvasJS.Chart("chartContainer",
 	
 var book = {
 	count: 0,
-	url: 'https://mdgateway04.easynvest.com.br/iwg/snapshot/?t=webgateway&c=5448062&q=WINJ19',
+	url: 'https://mdgateway04.easynvest.com.br/iwg/snapshot/?t=webgateway&c=5448062&q=WINM19',
 	atualizar: function(){		
 		$.get(book.url, function( data ) {
 			var retorno = data;

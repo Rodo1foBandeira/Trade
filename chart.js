@@ -16,7 +16,6 @@ var chart = new CanvasJS.Chart("chartContainer",
 	data: [
 		{
 			type: "candlestick",
-			color: "#ad9AD",
 			dataPoints: []
 		}
 	]
