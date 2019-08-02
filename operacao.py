@@ -1,36 +1,35 @@
 class Operacao:   
-    price = 0
-    bs = 0
-    slt = 0
-    slti = 0
-    slf = 0
+    entrada = 0
+    cv = ''
+    sl = 0    
     gain = 0
-    distance = 0
-    realizada = 0
+    distancia = 0
+    saida = 0
     data_hora_entrada = 0
     data_hora_saida = 0
     # slt: stop loss tralling
     # slti: stop loss tralling input
     # slf: stop loss fix
     # bs: buy/sell
-    def __init__(self, data_hora_entrada, bs, price, distance=0, slt=0, slti=0, slf=0, gain=0):
-        self.price = price
-        self.bs = bs
-        self.slt = slt
-        self.slti = slti
-        self.slf = slf
+    def __init__(self, data_hora_entrada, cv, preco, distancia=0, gain=0):
+        self.entrada = preco
+        self.cv = cv
         self.gain = gain
-        self.distance = distance
+        self.distancia = distancia
         self.data_hora_entrada = data_hora_entrada
-    
-    def adjustStop(self, price):
-        if self.bs == 'B':
-            if self.slt != 0 and price - self.distance > self.slt:
-                self.slt = price - self.distance
-            elif self.slti != 0 and self.price + self.distance >= price:
-                self.slti = self.price
+        if cv[0] == 'C':
+            self.sl = preco - distancia
         else:
-            if self.slt != 0 and price + self.distance < self.slt:
-                self.slt = price + self.distance
-            elif self.slti != 0 and self.price - self.distance <= price:
-                self.slti = self.price
+            self.sl = preco + distancia
+    
+    def adjustStop(self, preco):
+        if self.cv[0] == 'C':
+            if self.cv[1:] == 'slt' and preco - self.distancia > self.sl:
+                self.sl = preco - self.distancia
+            if self.cv[1:] == 'slti' and preco >= self.entrada + self.distancia:
+                self.sl = self.entrada
+        else:
+            if self.cv[1:] == 'slt' and preco + self.distancia < self.sl:
+                self.sl = preco + self.distancia
+            if self.cv[1:] == 'slti' and preco <= self.entrada - self.distancia:
+                self.sl = self.entrada
