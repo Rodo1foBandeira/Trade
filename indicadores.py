@@ -29,6 +29,6 @@ def pontos(dfHist, cruzamentosValorMediaMovel, frequenciaMinima):
          cruzouPraBaixo = cruzamentosValorMediaMovel[i+1]['index']
          bins = dfHist[cruzouPraCima:cruzouPraBaixo][lambda y: y.frq > int(frequenciaMinima)][lambda x: x.frq == dfHist[cruzouPraCima:cruzouPraBaixo].frq.max()].bins.values
          if len(bins) > 0:
-            pontos.append(bins[0])
+            pontos.append(int(bins[0]))
       i += 1
    return pontos
