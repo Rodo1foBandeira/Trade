@@ -9,6 +9,8 @@ import indicadores
 
 df = pd.read_csv(sys.argv[1], names=['time', 'buyer', 'seller', 'price', 'qtd', 'tot_qtd', 'tot_buss'], index_col='time')
 
+df.index = pd.to_datetime(df.index)
+
 dfPreco = pd.DataFrame({'preco': indicadores.gerarPrecosPorVolume(df, 'price', 'qtd')})
 
 frq, bins = np.histogram(dfPreco.preco, bins=int(((dfPreco.preco.max()-dfPreco.preco.min()) / 5) / 4))
